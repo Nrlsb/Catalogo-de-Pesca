@@ -5,6 +5,21 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'brand-dark': '#111827', // Un fondo oscuro principal
+              'brand-card': '#1f2937', // Un fondo ligeramente más claro para las tarjetas
+              'brand-primary': '#4f46e5', // Un azul/violeta vibrante del logo
+              'brand-secondary': '#facc15', // Un amarillo/dorado del logo
+              'brand-light': '#d1d5db', // Texto principal claro
+            }
+          }
+        }
+      }
+    </script>
     <title>Catalogo de Pesca</title>
   </head>
   <body>

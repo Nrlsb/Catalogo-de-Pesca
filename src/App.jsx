@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
 // --- Datos de ejemplo ---
-// En una aplicación real, esto vendría de una API.
 const initialProducts = [
   {
     id: 1,
@@ -9,7 +8,7 @@ const initialProducts = [
     category: 'Cañas',
     price: 89.99,
     description: 'Caña de fibra de carbono ultraligera, ideal para spinning en ríos y lagos. Longitud de 2.10m.',
-    image: 'https://placehold.co/600x400/3498db/ffffff?text=Caña+de+Pescar',
+    image: 'https://placehold.co/600x400/4f46e5/ffffff?text=Caña+de+Pescar',
   },
   {
     id: 2,
@@ -57,7 +56,7 @@ const initialProducts = [
     category: 'Cañas',
     price: 150.00,
     description: 'Caña de 4 tramos para pesca con mosca, número #5. Acción media-rápida.',
-    image: 'https://placehold.co/600x400/3498db/ffffff?text=Caña+Fly',
+    image: 'https://placehold.co/600x400/4f46e5/ffffff?text=Caña+Fly',
   },
   {
     id: 8,
@@ -79,15 +78,15 @@ const ShoppingCartIcon = () => (
 // --- Componente: Tarjeta de Producto ---
 const ProductCard = ({ product }) => {
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 ease-in-out">
+    <div className="bg-brand-card rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 ease-in-out border border-gray-700">
       <img src={product.image} alt={`Imagen de ${product.name}`} className="w-full h-48 object-cover" />
-      <div className="p-4">
-        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">{product.category}</span>
-        <h3 className="text-lg font-semibold my-2 text-gray-800">{product.name}</h3>
-        <p className="text-gray-600 text-sm mb-4 h-16">{product.description}</p>
-        <div className="flex justify-between items-center">
-          <span className="text-2xl font-bold text-blue-600">${product.price.toFixed(2)}</span>
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors duration-200 flex items-center gap-2">
+      <div className="p-4 flex flex-col h-full">
+        <span className="text-xs bg-brand-primary/20 text-brand-primary px-2 py-1 rounded-full self-start">{product.category}</span>
+        <h3 className="text-lg font-semibold my-2 text-white">{product.name}</h3>
+        <p className="text-brand-light text-sm mb-4 h-16 flex-grow">{product.description}</p>
+        <div className="flex justify-between items-center mt-auto">
+          <span className="text-2xl font-bold text-brand-secondary">${product.price.toFixed(2)}</span>
+          <button className="bg-brand-primary text-white px-4 py-2 rounded-lg hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-opacity-50 transition-colors duration-200 flex items-center gap-2">
             <ShoppingCartIcon />
             <span className="hidden sm:inline">Añadir</span>
           </button>
@@ -100,19 +99,19 @@ const ProductCard = ({ product }) => {
 // --- Componente: Barra de Búsqueda y Filtros ---
 const SearchAndFilter = ({ searchTerm, setSearchTerm, filterCategory, setFilterCategory, categories }) => {
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md mb-8 sticky top-4 z-10">
+    <div className="bg-brand-card/80 backdrop-blur-sm p-4 rounded-lg shadow-lg mb-8 sticky top-4 z-10 border border-gray-700">
       <div className="flex flex-col md:flex-row gap-4">
         <input
           type="text"
-          placeholder="Buscar producto por nombre..."
+          placeholder="Buscar cañas, señuelos, carretes..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="flex-grow p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-grow p-3 bg-brand-dark border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-brand-primary"
         />
         <select
           value={filterCategory}
           onChange={(e) => setFilterCategory(e.target.value)}
-          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+          className="p-3 bg-brand-dark border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-brand-primary"
         >
           <option value="All">Todas las categorías</option>
           {categories.map(category => (
@@ -131,15 +130,13 @@ export default function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('All');
 
-  // Simula la carga de datos cuando el componente se monta
+  // Simula la carga de datos
   useEffect(() => {
     setProducts(initialProducts);
   }, []);
 
-  // Extrae las categorías únicas de los productos
   const categories = [...new Set(products.map(p => p.category))];
 
-  // Filtra los productos según la búsqueda y la categoría seleccionada
   const filteredProducts = products.filter(product => {
     const matchesSearchTerm = product.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = filterCategory === 'All' || product.category === filterCategory;
@@ -147,18 +144,21 @@ export default function App() {
   });
 
   return (
-    <div className="bg-gray-100 min-h-screen font-sans">
+    <div className="bg-brand-dark min-h-screen font-sans text-brand-light">
       {/* Encabezado */}
-      <header className="bg-white shadow-md">
+      <header className="bg-brand-card/80 backdrop-blur-sm border-b border-gray-700 sticky top-0 z-20">
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-blue-600">
-            <span role="img" aria-label="fishing-pole" className="mr-2">🎣</span>
-            PescaShop
-          </h1>
+          <div className="flex items-center gap-3">
+            {/* He añadido una referencia a tu logo. Deberías colocar "1000153989.jpg" en la carpeta `public` de tu proyecto. */}
+            <img src="/1000153989.jpg" alt="PescaShop Logo" className="h-12 w-auto" />
+            <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-yellow-300">
+              PescaShop
+            </h1>
+          </div>
           <nav>
-            <a href="#" className="text-gray-600 hover:text-blue-600 mx-3">Inicio</a>
-            <a href="#" className="text-gray-600 hover:text-blue-600 mx-3">Ofertas</a>
-            <a href="#" className="text-gray-600 hover:text-blue-600 mx-3">Contacto</a>
+            <a href="#" className="text-brand-light hover:text-brand-secondary mx-3 transition-colors">Inicio</a>
+            <a href="#" className="text-brand-light hover:text-brand-secondary mx-3 transition-colors">Ofertas</a>
+            <a href="#" className="text-brand-light hover:text-brand-secondary mx-3 transition-colors">Contacto</a>
           </nav>
         </div>
       </header>
@@ -181,17 +181,17 @@ export default function App() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-16">
-             <p className="text-gray-500 text-xl">No se encontraron productos que coincidan con tu búsqueda.</p>
+          <div className="text-center py-16 bg-brand-card rounded-lg">
+             <p className="text-brand-light text-xl">No se encontraron productos que coincidan con tu búsqueda.</p>
           </div>
         )}
       </main>
 
       {/* Pie de Página */}
-      <footer className="bg-gray-800 text-white mt-12">
-        <div className="container mx-auto px-6 py-4 text-center">
+      <footer className="bg-brand-card mt-12 border-t border-gray-700">
+        <div className="container mx-auto px-6 py-6 text-center">
           <p>&copy; 2025 PescaShop. Todos los derechos reservados.</p>
-          <p>Tu tienda de confianza para equipamiento de pesca.</p>
+          <p className="text-sm text-gray-400">Tu tienda de confianza para equipamiento de pesca.</p>
         </div>
       </footer>
     </div>

@@ -1,73 +1,5 @@
 import React, { useState, useEffect } from 'react';
 
-// --- Datos de ejemplo ---
-const initialProducts = [
-  {
-    id: 1,
-    name: 'Caña de Pescar "Río Pro"',
-    category: 'Cañas',
-    price: 89.99,
-    description: 'Caña de fibra de carbono ultraligera, ideal para spinning en ríos y lagos. Longitud de 2.10m.',
-    image: 'https://placehold.co/600x400/4f46e5/ffffff?text=Caña+de+Pescar',
-  },
-  {
-    id: 2,
-    name: 'Carrete Spinning "Tornado 3000"',
-    category: 'Carretes',
-    price: 125.50,
-    description: 'Carrete de alta velocidad con 8 rodamientos de acero inoxidable. Freno delantero preciso.',
-    image: 'https://placehold.co/600x400/2ecc71/ffffff?text=Carrete',
-  },
-  {
-    id: 3,
-    name: 'Señuelo Articulado "Depredador"',
-    category: 'Señuelos',
-    price: 15.75,
-    description: 'Señuelo de natación realista con múltiples articulaciones. Perfecto para la pesca de dorados y tarariras.',
-    image: 'https://placehold.co/600x400/e74c3c/ffffff?text=Señuelo',
-  },
-  {
-    id: 4,
-    name: 'Línea de Pesca Trenzada "Invisible"',
-    category: 'Líneas',
-    price: 22.00,
-    description: 'Línea trenzada de 8 hebras, 0.20mm de diámetro y alta resistencia a la abrasión. Bobina de 150m.',
-    image: 'https://placehold.co/600x400/9b59b6/ffffff?text=Línea',
-  },
-  {
-    id: 5,
-    name: 'Caja de Aparejos "Organizador Total"',
-    category: 'Accesorios',
-    price: 35.00,
-    description: 'Caja robusta con compartimentos ajustables para señuelos, anzuelos y otros accesorios.',
-    image: 'https://placehold.co/600x400/f1c40f/ffffff?text=Caja',
-  },
-  {
-    id: 6,
-    name: 'Anzuelos Triples "Garra de Acero"',
-    category: 'Anzuelos',
-    price: 9.50,
-    description: 'Paquete de 10 anzuelos triples extra afilados, tamaño #4. Ideales para señuelos.',
-    image: 'https://placehold.co/600x400/e67e22/ffffff?text=Anzuelos',
-  },
-  {
-    id: 7,
-    name: 'Caña de Fly Cast "Brisa Andina"',
-    category: 'Cañas',
-    price: 150.00,
-    description: 'Caña de 4 tramos para pesca con mosca, número #5. Acción media-rápida.',
-    image: 'https://placehold.co/600x400/4f46e5/ffffff?text=Caña+Fly',
-  },
-  {
-    id: 8,
-    name: 'Carrete de Baitcasting "Precisión X"',
-    category: 'Carretes',
-    price: 180.99,
-    description: 'Carrete de bajo perfil con freno magnético para lances precisos y largos.',
-    image: 'https://placehold.co/600x400/2ecc71/ffffff?text=Carrete+Bait',
-  }
-];
-
 // --- Componente: Ícono de Carrito ---
 const ShoppingCartIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -77,15 +9,25 @@ const ShoppingCartIcon = () => (
 
 // --- Componente: Tarjeta de Producto ---
 const ProductCard = ({ product }) => {
+  // Asegurarse de que el precio se muestre correctamente si es un número o un texto.
+  const displayPrice = typeof product.price === 'number' 
+    ? `$${product.price.toFixed(2)}` 
+    : product.price;
+
   return (
     <div className="bg-brand-card rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 ease-in-out border border-gray-700">
-      <img src={product.image} alt={`Imagen de ${product.name}`} className="w-full h-48 object-cover" />
+      <img 
+        src={product.image || 'https://placehold.co/600x400/1f2937/d1d5db?text=Producto'} 
+        alt={`Imagen de ${product.name}`} 
+        className="w-full h-48 object-cover" 
+        onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/600x400/1f2937/d1d5db?text=Error+Imagen'; }}
+      />
       <div className="p-4 flex flex-col h-full">
         <span className="text-xs bg-brand-primary/20 text-brand-primary px-2 py-1 rounded-full self-start">{product.category}</span>
         <h3 className="text-lg font-semibold my-2 text-white">{product.name}</h3>
-        <p className="text-brand-light text-sm mb-4 h-16 flex-grow">{product.description}</p>
+        <p className="text-brand-light text-sm mb-4 h-24 flex-grow overflow-auto">{product.description}</p>
         <div className="flex justify-between items-center mt-auto">
-          <span className="text-2xl font-bold text-brand-secondary">${product.price.toFixed(2)}</span>
+          <span className="text-2xl font-bold text-brand-secondary">{displayPrice}</span>
           <button className="bg-brand-primary text-white px-4 py-2 rounded-lg hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-opacity-50 transition-colors duration-200 flex items-center gap-2">
             <ShoppingCartIcon />
             <span className="hidden sm:inline">Añadir</span>
@@ -123,22 +65,49 @@ const SearchAndFilter = ({ searchTerm, setSearchTerm, filterCategory, setFilterC
   );
 };
 
+// --- Componente de Carga ---
+const LoadingSpinner = () => (
+  <div className="flex justify-center items-center py-16">
+    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-brand-primary"></div>
+    <p className="ml-4 text-xl text-brand-light">Cargando productos...</p>
+  </div>
+);
 
 // --- Componente Principal: App ---
 export default function App() {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('All');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Simula la carga de datos
+  // Carga de datos desde la API del backend
   useEffect(() => {
-    setProducts(initialProducts);
-  }, []);
+    const fetchProducts = async () => {
+      try {
+        // Asegúrate de que tu backend esté corriendo en el puerto 3001
+        const response = await fetch('http://localhost:3001/api/products');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setProducts(data);
+      } catch (e) {
+        console.error("Error al obtener los productos:", e);
+        setError("No se pudieron cargar los productos. Asegúrate de que el servidor backend esté funcionando.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []); // El array vacío asegura que este efecto se ejecute solo una vez
 
   const categories = [...new Set(products.map(p => p.category))];
 
   const filteredProducts = products.filter(product => {
-    const matchesSearchTerm = product.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const name = product.name || '';
+    const matchesSearchTerm = name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = filterCategory === 'All' || product.category === filterCategory;
     return matchesSearchTerm && matchesCategory;
   });
@@ -149,7 +118,6 @@ export default function App() {
       <header className="bg-brand-card/80 backdrop-blur-sm border-b border-gray-700 sticky top-0 z-20">
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            {/* He añadido una referencia a tu logo. Deberías colocar "1000153989.jpg" en la carpeta `public` de tu proyecto. */}
             <img src="/1000153989.jpg" alt="PescaShop Logo" className="h-12 w-auto" />
             <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-yellow-300">
               PescaShop
@@ -174,7 +142,14 @@ export default function App() {
         />
 
         {/* Malla de Productos */}
-        {filteredProducts.length > 0 ? (
+        {loading ? (
+          <LoadingSpinner />
+        ) : error ? (
+          <div className="text-center py-16 bg-red-900/50 border border-red-700 text-red-300 rounded-lg">
+            <h2 className="text-2xl font-bold mb-2">Error</h2>
+            <p className="text-xl">{error}</p>
+          </div>
+        ) : filteredProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {filteredProducts.map(product => (
               <ProductCard key={product.id} product={product} />

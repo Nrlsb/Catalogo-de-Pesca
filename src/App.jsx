@@ -85,8 +85,9 @@ export default function App() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        // Asegúrate de que tu backend esté corriendo en el puerto 3001
-        const response = await fetch('http://localhost:3001/api/products');
+        // Usamos una variable de entorno para la URL de la API, con un valor por defecto para desarrollo local
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        const response = await fetch(`${apiUrl}/api/products`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -94,7 +95,7 @@ export default function App() {
         setProducts(data);
       } catch (e) {
         console.error("Error al obtener los productos:", e);
-        setError("No se pudieron cargar los productos. Asegúrate de que el servidor backend esté funcionando.");
+        setError("No se pudieron cargar los productos. Asegúrate de que el servidor backend esté funcionando y que la URL de la API sea correcta.");
       } finally {
         setLoading(false);
       }
@@ -172,3 +173,4 @@ export default function App() {
     </div>
   );
 }
+

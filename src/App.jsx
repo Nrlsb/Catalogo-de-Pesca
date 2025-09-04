@@ -132,7 +132,7 @@ export default function App() {
           <div className="flex items-center gap-3">
             <img src="/1000153989.jpg" alt="PescaShop Logo" className="h-12 w-auto" />
             <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-yellow-300">
-              PescaShop
+              MaxiPesca
             </h1>
           </div>
           <nav>

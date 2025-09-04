@@ -14,19 +14,30 @@ const ProductCard = ({ product }) => {
     ? `$${product.price.toFixed(2)}` 
     : product.price;
 
+  // Divide la descripción en puntos para mostrarla como una lista
+  const descriptionPoints = product.description.split('. ').filter(point => point);
+
   return (
-    <div className="bg-brand-card rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 ease-in-out border border-gray-700">
+    <div className="bg-brand-card rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 ease-in-out border border-gray-700 flex flex-col">
       <img 
         src={product.image || 'https://placehold.co/600x400/1f2937/d1d5db?text=Producto'} 
         alt={`Imagen de ${product.name}`} 
         className="w-full h-48 object-cover" 
         onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/600x400/1f2937/d1d5db?text=Error+Imagen'; }}
       />
-      <div className="p-4 flex flex-col h-full">
-        <span className="text-xs bg-brand-primary/20 text-brand-primary px-2 py-1 rounded-full self-start">{product.category}</span>
-        <h3 className="text-lg font-semibold my-2 text-white">{product.name}</h3>
-        <p className="text-brand-light text-sm mb-4 h-24 flex-grow overflow-auto">{product.description}</p>
-        <div className="flex justify-between items-center mt-auto">
+      <div className="p-4 flex flex-col flex-grow">
+        <span className="text-xs bg-brand-primary/20 text-brand-primary px-2 py-1 rounded-full self-start mb-2">{product.category}</span>
+        <h3 className="text-lg font-semibold text-white">{product.name}</h3>
+        
+        <div className="text-brand-light text-sm my-4 flex-grow h-32 overflow-y-auto pr-2">
+          <ul className="list-disc list-inside space-y-1">
+            {descriptionPoints.map((point, index) => (
+              <li key={index}>{point}</li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="flex justify-between items-center mt-auto pt-4 border-t border-gray-700">
           <span className="text-2xl font-bold text-brand-secondary">{displayPrice}</span>
           <button className="bg-brand-primary text-white px-4 py-2 rounded-lg hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-opacity-50 transition-colors duration-200 flex items-center gap-2">
             <ShoppingCartIcon />
@@ -173,4 +184,5 @@ export default function App() {
     </div>
   );
 }
+
 

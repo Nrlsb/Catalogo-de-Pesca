@@ -1,28 +1,29 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
+      // Configuración de Tailwind CSS para que coincida con el nuevo diseño
       tailwind.config = {
         theme: {
           extend: {
             colors: {
-              'brand-dark': '#111827', // Un fondo oscuro principal
-              'brand-card': '#1f2937', // Un fondo ligeramente más claro para las tarjetas
-              'brand-primary': '#4f46e5', // Un azul/violeta vibrante del logo
-              'brand-secondary': '#facc15', // Un amarillo/dorado del logo
-              'brand-light': '#d1d5db', // Texto principal claro
+              'brand-dark': '#0a0f18',      // Fondo principal más oscuro
+              'brand-card': '#161e2b',      // Fondo de las tarjetas y header
+              'brand-primary': '#2563eb',   // Azul para el botón "Detalles"
+              'brand-secondary': '#16a34a', // Verde para el botón "Consultar"
+              'brand-light': '#d1d5db',     // Texto principal claro
             }
           }
         }
       }
     </script>
-    <title>Catalogo de Pesca</title>
+    <title>Catalogo de Pesca - Maxi Pesca</title>
   </head>
-  <body>
+  <body class="bg-brand-dark">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

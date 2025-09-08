@@ -1,48 +1,107 @@
 import React, { useState, useEffect } from 'react';
 
-// --- Componente: Ícono de Carrito ---
-const ShoppingCartIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-  </svg>
-);
+// --- Componente: Modal de Detalles del Producto ---
+const ProductModal = ({ product, onClose }) => {
+  if (!product) return null;
 
-// --- Componente: Tarjeta de Producto ---
-const ProductCard = ({ product }) => {
-  // Asegurarse de que el precio se muestre correctamente si es un número o un texto.
-  const displayPrice = typeof product.price === 'number' 
-    ? `$${product.price.toFixed(2)}` 
-    : product.price;
-
-  // Divide la descripción en puntos para mostrarla como una lista
+  // Parsea la descripción para mostrarla como una lista de especificaciones
   const descriptionPoints = product.description.split('. ').filter(point => point);
 
   return (
-    <div className="bg-brand-card rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 ease-in-out border border-gray-700 flex flex-col">
-      <img 
-        src={product.image || 'https://placehold.co/600x400/1f2937/d1d5db?text=Producto'} 
-        alt={`Imagen de ${product.name}`} 
-        className="w-full h-48 object-cover" 
-        onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/600x400/1f2937/d1d5db?text=Error+Imagen'; }}
-      />
-      <div className="p-4 flex flex-col flex-grow">
-        <span className="text-xs bg-brand-primary/20 text-brand-primary px-2 py-1 rounded-full self-start mb-2">{product.category}</span>
-        <h3 className="text-lg font-semibold text-white">{product.name}</h3>
-        
-        <div className="text-brand-light text-sm my-4 flex-grow h-32 overflow-y-auto pr-2">
-          <ul className="list-disc list-inside space-y-1">
-            {descriptionPoints.map((point, index) => (
-              <li key={index}>{point}</li>
-            ))}
-          </ul>
-        </div>
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50 p-4 transition-opacity duration-300"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-brand-card rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col md:flex-row relative animate-fade-in-up"
+        onClick={(e) => e.stopPropagation()} // Evita que el clic dentro del modal lo cierre
+      >
+        {/* Botón de cerrar */}
+        <button 
+          onClick={onClose} 
+          className="absolute -top-4 -right-4 h-10 w-10 bg-brand-primary text-white rounded-full shadow-lg hover:bg-indigo-500 transition-transform duration-200 hover:scale-110 z-10"
+          aria-label="Cerrar modal"
+        >
+          ✕
+        </button>
 
-        <div className="flex justify-between items-center mt-auto pt-4 border-t border-gray-700">
-          <span className="text-2xl font-bold text-brand-secondary">{displayPrice}</span>
-          <button className="bg-brand-primary text-white px-4 py-2 rounded-lg hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-opacity-50 transition-colors duration-200 flex items-center gap-2">
-            <ShoppingCartIcon />
-            <span className="hidden sm:inline">Añadir</span>
+        {/* Contenido del Modal */}
+        <div className="md:w-1/2 p-6 flex justify-center items-center bg-brand-dark/50 rounded-l-lg">
+          <img 
+            src={product.image || 'https://placehold.co/600x400/1f2937/d1d5db?text=Producto'} 
+            alt={`Imagen de ${product.name}`} 
+            className="max-w-full max-h-96 object-contain"
+            onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/600x400/1f2937/d1d5db?text=Error+Imagen'; }}
+          />
+        </div>
+        <div className="md:w-1/2 p-8 flex flex-col overflow-y-auto">
+          <h2 className="text-3xl font-bold text-white mb-4">{product.name}</h2>
+          <span className="text-sm bg-brand-primary/20 text-brand-primary px-3 py-1 rounded-full self-start mb-6">{product.category}</span>
+          
+          <div className="text-brand-light space-y-3">
+             <h4 className="text-lg font-semibold text-white border-b border-gray-700 pb-2 mb-3">Especificaciones</h4>
+             <ul className="list-disc list-inside space-y-2">
+                {descriptionPoints.map((point, index) => (
+                  <li key={index}>{point.trim()}</li>
+                ))}
+             </ul>
+          </div>
+          
+           <div className="mt-auto pt-6">
+             <span className="text-3xl font-bold text-brand-secondary">{`$${product.price}`}</span>
+           </div>
+        </div>
+      </div>
+      <style jsx>{`
+        @keyframes fade-in-up {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fade-in-up {
+          animation: fade-in-up 0.3s ease-out forwards;
+        }
+      `}</style>
+    </div>
+  );
+};
+
+
+// --- Componente: Tarjeta de Producto ---
+const ProductCard = ({ product, onDetailsClick }) => {
+  return (
+    <div className="bg-brand-card rounded-lg shadow-lg overflow-hidden border border-gray-700 flex flex-col text-center transform hover:-translate-y-2 transition-transform duration-300 ease-in-out">
+      <div className="p-4 bg-white">
+          <img 
+            src={product.image || 'https://placehold.co/600x400/1f2937/d1d5db?text=Producto'} 
+            alt={`Imagen de ${product.name}`} 
+            className="w-full h-40 object-contain" 
+            onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/600x400/1f2937/d1d5db?text=Error+Imagen'; }}
+          />
+      </div>
+      <div className="p-4 flex flex-col flex-grow">
+        <h3 className="text-lg font-semibold text-white h-12 flex items-center justify-center">{product.name}</h3>
+        <p className="text-brand-light text-sm my-2">Haga clic para más opciones</p>
+        
+        <div className="grid grid-cols-2 gap-3 mt-auto pt-4 border-t border-gray-600">
+          <button 
+            onClick={() => onDetailsClick(product)}
+            className="bg-brand-primary text-white px-4 py-2 rounded-lg hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-opacity-50 transition-colors duration-200">
+            Detalles
           </button>
+           <a 
+            href={`https://wa.me/5493496656501?text=Hola,%20estoy%20interesado%20en%20el%20producto:%20${encodeURIComponent(product.name)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-brand-secondary text-gray-900 font-semibold px-4 py-2 rounded-lg hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-brand-secondary focus:ring-opacity-50 transition-colors duration-200 flex items-center justify-center"
+           >
+            Consultar
+          </a>
         </div>
       </div>
     </div>
@@ -52,7 +111,7 @@ const ProductCard = ({ product }) => {
 // --- Componente: Barra de Búsqueda y Filtros ---
 const SearchAndFilter = ({ searchTerm, setSearchTerm, filterCategory, setFilterCategory, categories }) => {
   return (
-    <div className="bg-brand-card/80 backdrop-blur-sm p-4 rounded-lg shadow-lg mb-8 sticky top-4 z-10 border border-gray-700">
+    <div className="bg-brand-card/80 backdrop-blur-sm p-4 rounded-lg shadow-lg mb-8 sticky top-24 z-10 border border-gray-700">
       <div className="flex flex-col md:flex-row gap-4">
         <input
           type="text"
@@ -91,12 +150,12 @@ export default function App() {
   const [filterCategory, setFilterCategory] = useState('All');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   // Carga de datos desde la API del backend
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        // Usamos una variable de entorno para la URL de la API, con un valor por defecto para desarrollo local
         const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
         const response = await fetch(`${apiUrl}/api/products`);
         if (!response.ok) {
@@ -106,16 +165,16 @@ export default function App() {
         setProducts(data);
       } catch (e) {
         console.error("Error al obtener los productos:", e);
-        setError("No se pudieron cargar los productos. Asegúrate de que el servidor backend esté funcionando y que la URL de la API sea correcta.");
+        setError("No se pudieron cargar los productos. Asegúrate de que el servidor backend esté funcionando.");
       } finally {
         setLoading(false);
       }
     };
 
     fetchProducts();
-  }, []); // El array vacío asegura que este efecto se ejecute solo una vez
+  }, []);
 
-  const categories = [...new Set(products.map(p => p.category))];
+  const categories = [...new Set(products.map(p => p.category))].sort();
 
   const filteredProducts = products.filter(product => {
     const name = product.name || '';
@@ -126,25 +185,29 @@ export default function App() {
 
   return (
     <div className="bg-brand-dark min-h-screen font-sans text-brand-light">
-      {/* Encabezado */}
-      <header className="bg-brand-card/80 backdrop-blur-sm border-b border-gray-700 sticky top-0 z-20">
+       {/* Encabezado */}
+       <header className="bg-brand-card/90 backdrop-blur-sm border-b border-gray-700 sticky top-0 z-20 shadow-lg">
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <img src="/1000153989.jpg" alt="PescaShop Logo" className="h-12 w-auto" />
-            <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-yellow-300">
-              MaxiPesca
-            </h1>
+          <div className="flex items-center gap-4">
+            <img src="/1000153989.jpg" alt="PescaShop Logo" className="h-12 w-auto rounded-full" />
+            <div>
+              <h1 className="text-2xl font-bold text-white">
+                Maxi Pesca
+              </h1>
+              <p className="text-sm text-gray-400">Tu tienda especialista en reels de pesca</p>
+            </div>
           </div>
-          <nav>
-            <a href="#" className="text-brand-light hover:text-brand-secondary mx-3 transition-colors">Inicio</a>
-            <a href="#" className="text-brand-light hover:text-brand-secondary mx-3 transition-colors">Ofertas</a>
-            <a href="#" className="text-brand-light hover:text-brand-secondary mx-3 transition-colors">Contacto</a>
+          <nav className="hidden md:flex items-center gap-2">
+            <a href="#" className="text-brand-light hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2 rounded-md transition-colors">Inicio</a>
+            <a href="#" className="text-brand-light hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2 rounded-md transition-colors">Ofertas</a>
+            <a href="#" className="text-brand-light hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2 rounded-md transition-colors">Contacto</a>
           </nav>
         </div>
       </header>
 
       {/* Contenido Principal */}
       <main className="container mx-auto px-6 py-8">
+        <h2 className="text-3xl font-bold text-white mb-6 text-left">Gama Alta</h2>
         <SearchAndFilter
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
@@ -162,9 +225,9 @@ export default function App() {
             <p className="text-xl">{error}</p>
           </div>
         ) : filteredProducts.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filteredProducts.map(product => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard key={product.id} product={product} onDetailsClick={setSelectedProduct} />
             ))}
           </div>
         ) : (
@@ -176,13 +239,13 @@ export default function App() {
 
       {/* Pie de Página */}
       <footer className="bg-brand-card mt-12 border-t border-gray-700">
-        <div className="container mx-auto px-6 py-6 text-center">
-          <p>&copy; 2025 PescaShop. Todos los derechos reservados.</p>
-          <p className="text-sm text-gray-400">Tu tienda de confianza para equipamiento de pesca.</p>
+        <div className="container mx-auto px-6 py-6 text-center text-gray-400">
+          <p>&copy; {new Date().getFullYear()} Maxi Pesca. Todos los derechos reservados.</p>
         </div>
       </footer>
+
+      {/* Renderizar el Modal */}
+      <ProductModal product={selectedProduct} onClose={() => setSelectedProduct(null)} />
     </div>
   );
 }
-
-

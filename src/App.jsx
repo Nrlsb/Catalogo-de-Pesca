@@ -20,8 +20,13 @@ const InstagramIcon = () => (
 const ContactModal = ({ show, onClose, product }) => {
   if (!show) return null;
 
-  const productName = product ? product.name : 'un producto';
-  const whatsappLink = `https://api.whatsapp.com/send/?phone=5493496419473&text=Hola,%20estoy%20interesado%20en%20el%20producto:%20${encodeURIComponent(productName)}`;
+  // Determina si la consulta es sobre un producto específico o una consulta general
+  const isProductSpecific = product && typeof product === 'object';
+  const message = isProductSpecific
+    ? `Hola, estoy interesado en el producto: ${product.name}`
+    : 'Hola, quisiera hacer una consulta general.';
+
+  const whatsappLink = `https://api.whatsapp.com/send/?phone=5493496419473&text=${encodeURIComponent(message)}`;
   const instagramLink = "https://www.instagram.com/maxi_pesca2025/";
 
   return (
@@ -284,9 +289,11 @@ export default function App() {
             </div>
           </div>
           <nav className="hidden md:flex items-center gap-2">
-            <a href="#" className="text-brand-light hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2 rounded-md transition-colors">Inicio</a>
-            <a href="#" className="text-brand-light hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2 rounded-md transition-colors">Ofertas</a>
-            <a href="#" className="text-brand-light hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2 rounded-md transition-colors">Contacto</a>
+            <button 
+              onClick={() => setSelectedProductContact(true)} 
+              className="text-brand-light hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2 rounded-md transition-colors">
+              Contacto
+            </button>
           </nav>
         </div>
       </header>

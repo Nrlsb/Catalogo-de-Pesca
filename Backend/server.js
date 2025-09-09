@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import productRoutes from './routes/products.js';
+import categoryRoutes from './routes/categories.js';
 
 // Cargar variables de entorno
 dotenv.config();
@@ -20,8 +21,10 @@ app.get('/', (req, res) => {
 
 // Rutas de la API
 app.use('/api/products', productRoutes);
+app.use('/api/categories', categoryRoutes);
 
 // Iniciar el servidor
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
+

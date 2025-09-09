@@ -4,11 +4,12 @@ import ProductModal from './components/ProductModal';
 import ProductCard from './components/ProductCard';
 import SearchAndFilter from './components/SearchAndFilter';
 import ProductGridSkeleton from './components/ProductGridSkeleton';
+import useDebounce from './hooks/useDebounce';
 
 // --- Componente Principal: App ---
 export default function App() {
   const [products, setProducts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(''); // Mantiene el valor instantáneo del input
   const [filterCategory, setFilterCategory] = useState('All');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,6 +17,10 @@ export default function App() {
   // Estados para los modales
   const [selectedProductDetails, setSelectedProductDetails] = useState(null);
   const [selectedProductContact, setSelectedProductContact] = useState(null);
+
+  // Usamos el hook useDebounce para obtener un valor que solo se actualiza 
+  // 500ms después de que el usuario deja de escribir.
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -39,7 +44,8 @@ export default function App() {
 
   const filteredProducts = products.filter(product => {
     const name = product.name || '';
-    const matchesSearchTerm = name.toLowerCase().includes(searchTerm.toLowerCase());
+    // La lógica de filtrado ahora usa el término de búsqueda "debounced"
+    const matchesSearchTerm = name.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
     const matchesCategory = filterCategory === 'All' || product.category === filterCategory;
     return matchesSearchTerm && matchesCategory;
   });
@@ -118,4 +124,5 @@ export default function App() {
     </div>
   );
 }
+
 

@@ -3,7 +3,7 @@ import ContactModal from './components/ContactModal';
 import ProductModal from './components/ProductModal';
 import ProductCard from './components/ProductCard';
 import SearchAndFilter from './components/SearchAndFilter';
-import LoadingSpinner from './components/LoadingSpinner';
+import ProductGridSkeleton from './components/ProductGridSkeleton';
 
 // --- Componente Principal: App ---
 export default function App() {
@@ -83,7 +83,7 @@ export default function App() {
         />
 
         {loading ? (
-          <LoadingSpinner />
+          <ProductGridSkeleton />
         ) : error ? (
           <div className="text-center py-16 bg-red-900/50 border border-red-700 text-red-300 rounded-lg">
             <h2 className="text-2xl font-bold mb-2">Error</h2>
@@ -118,3 +118,4 @@ export default function App() {
     </div>
   );
 }
+

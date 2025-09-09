@@ -1,50 +1,34 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react'; // Eliminamos useEffect porque ya no se usa aquí
 import ContactModal from './components/ContactModal';
 import ProductModal from './components/ProductModal';
 import ProductCard from './components/ProductCard';
 import SearchAndFilter from './components/SearchAndFilter';
 import ProductGridSkeleton from './components/ProductGridSkeleton';
 import useDebounce from './hooks/useDebounce';
+import { useProducts } from './hooks/useProducts'; // Importamos el nuevo hook
 
 // --- Componente Principal: App ---
 export default function App() {
-  const [products, setProducts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(''); // Mantiene el valor instantáneo del input
+  // Toda la lógica de fetching ahora está encapsulada en el hook useProducts.
+  // Obtenemos los productos, el estado de carga y el error directamente de él.
+  const { products, loading, error } = useProducts();
+
+  const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('All');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   
   // Estados para los modales
   const [selectedProductDetails, setSelectedProductDetails] = useState(null);
   const [selectedProductContact, setSelectedProductContact] = useState(null);
 
-  // Usamos el hook useDebounce para obtener un valor que solo se actualiza 
-  // 500ms después de que el usuario deja de escribir.
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-        const response = await fetch(`${apiUrl}/api/products`);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const data = await response.json();
-        setProducts(data);
-      } catch (e) {
-        console.error("Error al obtener los productos:", e);
-        setError("No se pudieron cargar los productos. Asegúrate de que el servidor backend esté funcionando.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProducts();
-  }, []);
+  // La lógica de obtención de datos (useEffect) ha sido movida al hook useProducts.
+  // Esto hace que el componente App sea más limpio y se enfoque solo en la UI.
 
   const categories = [...new Set(products.map(p => p.category))].sort();
 
   const filteredProducts = products.filter(product => {
     const name = product.name || '';
-    // La lógica de filtrado ahora usa el término de búsqueda "debounced"
     const matchesSearchTerm = name.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
     const matchesCategory = filterCategory === 'All' || product.category === filterCategory;
     return matchesSearchTerm && matchesCategory;
@@ -124,5 +108,4 @@ export default function App() {
     </div>
   );
 }
-
 

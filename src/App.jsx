@@ -1,39 +1,34 @@
-import React, { useState } from 'react'; // Eliminamos useEffect porque ya no se usa aquí
+import React, { useState } from 'react';
 import ContactModal from './components/ContactModal';
 import ProductModal from './components/ProductModal';
 import ProductCard from './components/ProductCard';
 import SearchAndFilter from './components/SearchAndFilter';
 import ProductGridSkeleton from './components/ProductGridSkeleton';
 import useDebounce from './hooks/useDebounce';
-import { useProducts } from './hooks/useProducts'; // Importamos el nuevo hook
+import { useProducts } from './hooks/useProducts';
+import { useCategories } from './hooks/useCategories';
 
 // --- Componente Principal: App ---
 export default function App() {
-  // Toda la lógica de fetching ahora está encapsulada en el hook useProducts.
-  // Obtenemos los productos, el estado de carga y el error directamente de él.
-  const { products, loading, error } = useProducts();
-
+  // Estados para controlar los filtros y la búsqueda
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('All');
+  const [sortOption, setSortOption] = useState('name-asc'); // Opción de ordenamiento por defecto
   
   // Estados para los modales
   const [selectedProductDetails, setSelectedProductDetails] = useState(null);
   const [selectedProductContact, setSelectedProductContact] = useState(null);
 
+  // Aplicamos debounce al término de búsqueda para no sobrecargar el servidor
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
-
-  // La lógica de obtención de datos (useEffect) ha sido movida al hook useProducts.
-  // Esto hace que el componente App sea más limpio y se enfoque solo en la UI.
-
-  const categories = [...new Set(products.map(p => p.category))].sort();
-
-  const filteredProducts = products.filter(product => {
-    const name = product.name || '';
-    const matchesSearchTerm = name.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
-    const matchesCategory = filterCategory === 'All' || product.category === filterCategory;
-    return matchesSearchTerm && matchesCategory;
-  });
   
+  // Obtenemos los datos desde nuestros hooks personalizados
+  const { categories } = useCategories();
+  const { products, loading, error } = useProducts(debouncedSearchTerm, filterCategory, sortOption);
+
+  // La lógica de filtrado en el cliente ha sido eliminada.
+  // La variable `products` ya contiene la lista filtrada y ordenada del servidor.
+
   const handleDetailsClick = (product) => setSelectedProductDetails(product);
   const handleConsultClick = (product) => setSelectedProductContact(product);
   const closeModals = () => {
@@ -70,6 +65,8 @@ export default function App() {
           filterCategory={filterCategory}
           setFilterCategory={setFilterCategory}
           categories={categories}
+          sortOption={sortOption}
+          setSortOption={setSortOption}
         />
 
         {loading ? (
@@ -79,9 +76,9 @@ export default function App() {
             <h2 className="text-2xl font-bold mb-2">Error</h2>
             <p className="text-xl">{error}</p>
           </div>
-        ) : filteredProducts.length > 0 ? (
+        ) : products.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filteredProducts.map(product => (
+            {products.map(product => ( // Usamos `products` directamente
               <ProductCard 
                 key={product.id} 
                 product={product} 

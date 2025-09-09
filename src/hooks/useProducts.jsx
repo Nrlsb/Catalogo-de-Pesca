@@ -1,26 +1,38 @@
 import { useState, useEffect } from 'react';
 
 /**
- * Hook personalizado para obtener la lista de productos.
- * Encapsula toda la lógica de fetching, incluyendo los estados
- * de carga y error, haciendo los componentes más limpios y reutilizables.
+ * Hook personalizado para obtener la lista de productos del servidor,
+ * aplicando filtros y ordenamiento.
  *
+ * @param {string} searchTerm - El término de búsqueda.
+ * @param {string} category - La categoría a filtrar.
+ * @param {string} sortOption - La opción de ordenamiento (ej: "price-asc").
  * @returns {{products: Array, loading: boolean, error: string|null}}
- * Un objeto que contiene la lista de productos, el estado de carga y
- * un posible mensaje de error.
  */
-export function useProducts() {
+export function useProducts(searchTerm, category, sortOption) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
+      setLoading(true); // Se activa el estado de carga en cada nueva petición
       try {
-        // La URL de la API se obtiene de las variables de entorno de Vite.
-        // Si no está definida, se usa un valor por defecto para desarrollo local.
         const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-        const response = await fetch(`${apiUrl}/api/products`);
+        
+        // Descomponemos la opción de ordenamiento en columna y dirección
+        const [sortBy, order] = sortOption.split('-');
+
+        // Construimos los parámetros de la URL de forma segura
+        const params = new URLSearchParams({ sortBy, order });
+        if (searchTerm) {
+          params.append('search', searchTerm);
+        }
+        if (category && category !== 'All') {
+          params.append('category', category);
+        }
+
+        const response = await fetch(`${apiUrl}/api/products?${params.toString()}`);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -28,19 +40,20 @@ export function useProducts() {
         
         const data = await response.json();
         setProducts(data);
+        setError(null); // Limpiamos errores previos si la petición es exitosa
       } catch (e) {
         console.error("Error al obtener los productos:", e);
         setError("No se pudieron cargar los productos. Asegúrate de que el servidor backend esté funcionando.");
+        setProducts([]); // Vaciamos los productos en caso de error
       } finally {
-        // Independientemente del resultado, la carga ha finalizado.
         setLoading(false);
       }
     };
 
     fetchProducts();
-    // El array de dependencias vacío `[]` asegura que el efecto se ejecute solo una vez,
-    // cuando el componente que usa el hook se monta por primera vez.
-  }, []);
+    // Este efecto se ejecutará cada vez que cambie uno de estos valores
+  }, [searchTerm, category, sortOption]);
 
   return { products, loading, error };
 }
+
